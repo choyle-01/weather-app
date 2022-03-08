@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+      background-color: #caf0f8;
+  }
+
+  h1 {
+      text-align: center;
+      padding: 15px;
+      background-color: #03045e;
+      color: white;
+      font-family: 'Oxygen', sans-serif;
+      font-size: 50px;
+  }
+
+  input {
+      padding-left: 8px;
+      
+  }

@@ -6,7 +6,7 @@ var currResults = document.querySelector('#current-results');
 var fiveDayResults = document.querySelector('#five-day-result');
 var cityResults = document.querySelector('#city-results');
 var searchHistory = document.querySelector('.search-history');
-var array = [];
+var array = JSON.parse(window.localStorage.getItem('History')) || [];
 
 
 
@@ -37,14 +37,7 @@ var renderHistory = function () {
   }
 }
 
-var getHistory = function () {
-  JSON.parse(window.localStorage.getItem('History'));
-  console.log('Hello')
-  renderHistory();
-  }
-
-
-getHistory();
+renderHistory();
 
 var getMap = function (city) {
     var requestURLMap = 'https://api.opencagedata.com/geocode/v1/json?q=' + city + '&key=d1434d00474d48c28118cbce83aad06f'
@@ -77,6 +70,7 @@ fetch(requestURLWeather)
   })
   .then(function (data) {
     console.log(data);
+    currResults.innerHTML = '';
     var temp = (data.current.temp);
     var wind = (data.current.wind_speed);
     var humidity = (data.current.humidity);
@@ -107,6 +101,7 @@ var getFiveDay = function (lat, long) {
   })
   .then(function (data) {
     console.log(data);
+    fiveDayResults.innerHTML = '';
     for (let i = 0; i < 5; i++) {
       var temp = (data.list[i].main.temp);
       var wind = (data.list[i].wind.speed);
