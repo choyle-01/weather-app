@@ -8,7 +8,7 @@ var searchHistory = document.querySelector('.search-history');
 var array = JSON.parse(window.localStorage.getItem('History')) || [];
 
 
-
+// function takes in the city name that was inputed into the search form and passes it to the populateHistory and getMap fuctions 
 var formSubmitHandler = function (event) {
     event.preventDefault();
   
@@ -20,12 +20,14 @@ var formSubmitHandler = function (event) {
     } 
   };
 
+  // stringifying the data and sending it into the local storage
 var populateHistory = function (searchCity) {
   array.push(searchCity)
   window.localStorage.setItem('History', JSON.stringify(array))
   renderHistory();
 }
 
+// creates buttons from the local storage and appends them to the page. Also has an event listener and function to call that info back to the page
 var renderHistory = function () {
   searchHistory.innerHTML = '';
 
@@ -45,6 +47,7 @@ var renderHistory = function () {
 
 renderHistory();
 
+// function takes in the city names and converts the city into a lattitude and longitude coordinates, also passes the coodinated on to the getWeather and getFiveDay functions
 var getMap = function (city) {
     var requestURLMap = 'https://api.opencagedata.com/geocode/v1/json?q=' + city + '&key=d1434d00474d48c28118cbce83aad06f'
     fetch(requestURLMap)
@@ -68,6 +71,7 @@ var getMap = function (city) {
 
 }
 
+// takes the lattitude and longitude and adds them into the API link, then gets the one day forecast and displays the needed information
 var getWeather = function (lat, long) {
     var requestURLWeather = 'https://api.openweathermap.org/data/2.5/onecall?lat=' + lat + '&lon=' + long + '&appid=' + key + '&units=imperial';
 fetch(requestURLWeather)
@@ -85,12 +89,27 @@ fetch(requestURLWeather)
     var tempResult = document.createElement('p');
     var windResult = document.createElement('p');
     var humidityResult = document.createElement('p');
-    var uvResult = document.createElement('p');
+    
+    if (uvIndex >= 6) {
+      var uvResult = document.createElement('button');
+      uvResult.classList.add('py-2', 'mx-4', 'btn', 'btn-danger');
+      uvResult.textContent = 'UVI: '+ uvIndex;
+    } else if (uvIndex <= 2) {
+      var uvResult = document.createElement('button');
+      uvResult.classList.add('py-2', 'mx-4', 'btn', 'btn-success');
+      uvResult.textContent = 'UVI: '+ uvIndex;
+    } else {
+      var uvResult = document.createElement('button');
+      uvResult.classList.add('py-2', 'mx-4', 'btn', 'btn-primary');
+      uvResult.textContent = 'UVI: '+ uvIndex;
+    }
+
     var iconImg = document.createElement('img');
     tempResult.textContent = ('Temp: ' + temp + '°F');
     windResult.textContent = ('Wind: ' + wind + ' MPH');
     humidityResult.textContent = ('Humidity: ' + humidity + '%');
     uvResult.textContent = ('UV index: ' + uvIndex);
+    uvResult.classList.add('UV-index');
     
     iconImg.src=('http://openweathermap.org/img/wn/' + icon + '.png')
     currResults.append(tempResult, windResult, humidityResult, uvResult, iconImg);
@@ -102,7 +121,7 @@ fetch(requestURLWeather)
   });
 
 }
-
+// does the same thing just with the five day forcast, also adds some divs and classes to help with bootstrap styling
 var getFiveDay = function (lat, long) {
   var requestURLFiveDay = 'https://api.openweathermap.org/data/2.5/forecast?lat='+ lat + '&lon=' + long + '&appid=' + key + '&units=imperial';
   fetch(requestURLFiveDay)
@@ -154,5 +173,5 @@ var getFiveDay = function (lat, long) {
     console.log(err);
   })
 }
-
+// event listener to detect when the form has been submitted
 searchForm.addEventListener('submit', formSubmitHandler)
