@@ -1,7 +1,6 @@
 var key = 'c74ce1b73d9f75951fefdcfe8410b259';
 var searchForm = document.querySelector('#searchform');
 var inputTxt = document.querySelector('#input-txt');
-var searchBtn = document.querySelector('#search-Btn');
 var currResults = document.querySelector('#current-results');
 var fiveDayResults = document.querySelector('#five-day-result');
 var cityResults = document.querySelector('#city-results');
@@ -15,7 +14,7 @@ var formSubmitHandler = function (event) {
   
     var cityName = inputTxt.value.trim();
   
-    if (cityName) {
+    if (!duplicateCities) {
       getMap(cityName);
       populateHistory(cityName);
     } 
@@ -29,12 +28,19 @@ var populateHistory = function (searchCity) {
 
 var renderHistory = function () {
   searchHistory.innerHTML = '';
+
   for (let i = 0; i < array.length; i++) {
+    (function () {
     var cityBtn = document.createElement('button');
     cityBtn.textContent = array[i]
-    cityBtn.setAttribute('class', 'history-button');
+    cityBtn.classList.add('btn', 'btn-primary', 'col-12', 'my-2');
     searchHistory.append(cityBtn);
-  }
+
+    cityBtn.addEventListener('click', function () {
+      getMap(cityBtn.innerText);
+    })
+  })()
+};
 }
 
 renderHistory();
@@ -50,10 +56,10 @@ var getMap = function (city) {
     var lat = (data.results[0].geometry.lat);
     var long = (data.results[0].geometry.lng);
     cityResults.textContent = city
-
+    
     if (lat, long) {
-        getWeather(lat, long);
-        getFiveDay(lat, long);
+      getWeather(lat, long);
+      getFiveDay(lat, long);
     }
   })
   .catch(function (err) {
@@ -75,15 +81,19 @@ fetch(requestURLWeather)
     var wind = (data.current.wind_speed);
     var humidity = (data.current.humidity);
     var uvIndex = (data.current.uvi);
-    var tempResult = document.createElement('li');
-    var windResult = document.createElement('li');
-    var humidityResult = document.createElement('li');
-    var uvResult = document.createElement('li');
+    var icon = (data.current.weather[0].icon)
+    var tempResult = document.createElement('p');
+    var windResult = document.createElement('p');
+    var humidityResult = document.createElement('p');
+    var uvResult = document.createElement('p');
+    var iconImg = document.createElement('img');
     tempResult.textContent = ('Temp: ' + temp + '°F');
     windResult.textContent = ('Wind: ' + wind + ' MPH');
     humidityResult.textContent = ('Humidity: ' + humidity + '%');
     uvResult.textContent = ('UV index: ' + uvIndex);
-    currResults.append(tempResult, windResult, humidityResult, uvResult);
+    
+    iconImg.src=('http://openweathermap.org/img/wn/' + icon + '.png')
+    currResults.append(tempResult, windResult, humidityResult, uvResult, iconImg);
 
     currResults.setAttribute('class', 'main-weather-card');
   })
@@ -107,17 +117,37 @@ var getFiveDay = function (lat, long) {
       var wind = (data.list[i].wind.speed);
       var humidity = (data.list[i].main.humidity);
       var date = (data.list[i].dt_txt);
-      var tempResult = document.createElement('li');
-      var windResult = document.createElement('li');
-      var humidityResult = document.createElement('li');
-      var dateResult = document.createElement('li');
+      var icon = (data.list[i].weather[0].icon);
+
+      var div1 = document.createElement('div');
+      
+      div1.classList.add('card-body', 'm-3')
+      
+      var tempResult = document.createElement('p');
+      div1.appendChild(tempResult)
+      var windResult = document.createElement('p');
+      div1.appendChild(windResult)
+      var humidityResult = document.createElement('p');
+      div1.appendChild(humidityResult)
+      var dateResult = document.createElement('p');
+      div1.appendChild(dateResult)
+      var iconImg = document.createElement('img');
+      iconImg.src=('http://openweathermap.org/img/wn/' + icon + '.png')
+      div1.appendChild(iconImg)
+      
+      fiveDayResults.appendChild(div1)
+      
       tempResult.textContent = ('Temp: ' + temp + '°F');
       windResult.textContent = ('Wind: ' + wind + ' MPH');
       humidityResult.textContent = ('Humidity: ' + humidity);
       dateResult.textContent = ('Date: ' + date);
-      fiveDayResults.append(tempResult, windResult, humidityResult, dateResult);
-
+      
       fiveDayResults.setAttribute('class', 'five-day-weather-card');
+      
+      dateResult.classList.add('card-text');
+      tempResult.classList.add('card-text');
+      windResult.classList.add('card-text');
+      humidityResult.classList.add('card-text');
     } 
   })
   .catch(function (err) {
