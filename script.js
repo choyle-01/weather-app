@@ -14,7 +14,7 @@ var formSubmitHandler = function (event) {
   
     var cityName = inputTxt.value.trim();
   
-    if (!duplicateCities) {
+    if (cityName) {
       getMap(cityName);
       populateHistory(cityName);
     } 
